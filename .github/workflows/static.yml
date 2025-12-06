@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+import sqlite3
+import os
+from datetime import datetime
+
+DB_PATH = "/home/noah/words.db"
+OUTPUT_PATH = "/home/noah/words-viewer/words.html"
+
+def generate_html():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("SELECT word, count, translation, tag, created_at FROM words ORDER BY created_at DESC")
+    rows = cur.fetchall()
+    conn.close()
+
+    html = """
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Words</title>
+        <style>
+            body { font-family: sans-serif; margin: 40px; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { padding: 10px; border-bottom: 1px solid #ddd; }
+            th { background: #f2f2f2; }
+        </style>
+    </head>
+    <body>
+        <h1>Saved Words</h1>
+        <p>Last updated: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+        <table>
+            <tr><th>Word</th><th>Count</th><th>Translation</th><th>Tag</th><th>Date</th></tr>
+    """
+
+    for word, count, translation, tag, created_at in rows:
+        html += f"""
+        <tr>
+            <td>{word}</td>
+            <td>{count}</td>
+            <td>{translation or ''}</td>
+            <td>{tag or ''}</td>
+            <td>{created_at}</td>
+        </tr>
+        """
+
+    html += """
+        </table>
+    </body>
+    </html>
+    """
+
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    print("HTML updated:", OUTPUT_PATH)
+
+if __name__ == "__main__":
+    generate_html()
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
