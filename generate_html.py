@@ -21,7 +21,7 @@ th { background-color: #eee; }
 <body>
 <h1>Word List</h1>
 <table>
-<tr><th>Word</th><th>Count</th><th>Translation</th><th>Tag</th><th>Updated</th></tr>
+<tr><th>Word</th><th>Count</th><th>Translation</th><th>Tag</th><th>Updated</th><button onclick="this. closest('tr'.remove())">削除</button></tr>
 """
 
 HTML_FOOT = """
