@@ -2,7 +2,7 @@
 import sqlite3
 import os
 
-DB_PATH = "/home/noah/UWorld-words-corrector/words.html"
+DB_PATH = "/home/noah/UWorld-words-corrector/words.db"
 OUTPUT_PATH = "/home/noah/UWorld-words-corrector/words.html"
 
 HTML_HEAD = """
